@@ -1,0 +1,184 @@
+/* Responsive Table for Manage Users */
+.admin-users-container {
+  background: var(--glass-bg);
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  width: 100%;
+  position: relative;
+}
+
+.back-button {
+  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.back-button:hover {
+  background: var(--primary-neon);
+  color: var(--bg-dark);
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.admin-table-container {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-table th, .admin-table td {
+  padding: 12px;
+}
+
+.admin-table thead tr {
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.admin-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.admin-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Mobile & Tablet Styles */
+@media (max-width: 768px) {
+  .admin-users-container {
+    padding: 16px;
+  }
+
+  .admin-table thead {
+    display: none;
+  }
+  
+  .admin-table, .admin-table tbody, .admin-table tr, .admin-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .admin-table tr {
+    margin-bottom: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border-bottom: none;
+    padding: 16px;
+  }
+
+  .admin-table td {
+    text-align: left;
+    padding: 0;
+    margin-bottom: 16px;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .admin-table td:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Specific fix for cell content wrapping on mobile */
+  .admin-table td > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .admin-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .admin-actions {
+    flex-direction: column;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .admin-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .admin-table td.actions-cell::before {
+    display: none;
+  }
+}
+
+/* Modal Styling */
+.user-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.user-modal-content {
+  background: var(--bg-dark);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.user-modal-text {
+  margin-top: 0;
+  margin-bottom: 24px;
+  font-size: 1.1rem;
+  color: var(--text-main);
+  line-height: 1.5;
+  text-align: justify;
+}
+
+.user-modal-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: stretch;
+}
+
+.user-modal-actions button {
+  flex: 1;
+  padding: 12px;
+  font-weight: bold;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.user-modal-actions button:hover {
+  opacity: 0.9;
+}

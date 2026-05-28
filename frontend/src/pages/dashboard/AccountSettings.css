@@ -1,0 +1,262 @@
+.account-settings-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow-x: hidden;
+}
+
+.account-sections-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 992px) {
+  .account-sections-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .account-sections-grid .full-width-section {
+    grid-column: 1 / -1;
+  }
+}
+
+.account-card {
+  padding: 32px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.account-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.account-card-header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--text-main);
+}
+
+.form-group-account {
+  margin-bottom: 20px;
+}
+
+.form-group-account label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.account-form-actions {
+  margin-top: auto;
+  padding-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Password Input with Eye Icon */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input-container .form-input {
+  padding-right: 40px;
+  width: 100%;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color var(--transition-smooth);
+}
+
+.password-toggle-btn:hover {
+  color: var(--primary-neon);
+}
+
+/* Reset Password Section */
+.reset-password-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px dashed var(--glass-border);
+  gap: 16px;
+}
+
+.reset-password-info {
+  flex: 1;
+}
+
+.reset-password-info p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Google Account Status */
+.google-status {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  margin-bottom: 24px;
+}
+
+.google-status .status-text {
+  flex: 1;
+}
+
+.google-status .status-text h4 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+}
+
+.google-status .status-text p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Google & Reset Buttons */
+.btn-google-action,
+.btn-reset-action {
+  font-family: sans-serif;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.05);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.btn-google-action:hover,
+.btn-reset-action:hover {
+  background: var(--primary-neon);
+  color: var(--bg-dark);
+  border-color: var(--primary-neon);
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.btn-google-action:disabled,
+.btn-reset-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Login History Table */
+.login-history-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.login-history-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--glass-border);
+  font-weight: 500;
+}
+
+.login-history-table td {
+  padding: 16px;
+  font-size: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.login-history-table tr:last-child td {
+  border-bottom: none;
+}
+
+.history-device {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .account-card {
+    padding: 20px;
+  }
+
+  /* Google status stacks vertically */
+  .google-status {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .btn-google-action {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Reset password section stacks vertically */
+  .reset-password-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-reset-action {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Login history vertical cards */
+  .login-history-table thead {
+    display: none;
+  }
+
+  .login-history-table tr {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .login-history-table td {
+    padding: 6px 0;
+    border: none;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .login-history-table td::before {
+    content: attr(data-label);
+    color: var(--text-muted);
+    font-size: 12px;
+    min-width: 80px;
+  }
+}

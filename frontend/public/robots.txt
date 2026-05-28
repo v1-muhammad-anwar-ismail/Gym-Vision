@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Hindari index pada halaman admin atau area khusus pengguna login
+Disallow: /dashboard/
+Disallow: /analysis/
+Disallow: /login/
+
+# Tautan ke Sitemap
+Sitemap: https://www.domain-gymvision-anda.com/sitemap.xml

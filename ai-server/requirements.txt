@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+python-dotenv
+requests
+mediapipe
+opencv-python
+numpy
+python-multipart

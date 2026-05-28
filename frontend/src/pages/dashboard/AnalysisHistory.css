@@ -1,0 +1,251 @@
+.history-page {
+  padding: 24px;
+  animation: fadeIn 0.4s ease;
+}
+
+.history-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.btn-back {
+  background: transparent;
+  border: none;
+  color: #C9D1D9;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  margin-top: 4px;
+}
+
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.history-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.history-header p {
+  color: #8B949E;
+  font-size: 15px;
+  margin: 0;
+}
+
+.storage-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(48, 54, 61, 0.5);
+  border: 1px solid #30363D;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 32px;
+  color: #C9D1D9;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.storage-note .note-icon {
+  color: var(--primary-neon);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.history-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 0;
+  color: #8B949E;
+  gap: 16px;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--primary-neon);
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.history-empty {
+  text-align: center;
+  padding: 64px 24px;
+  background: rgba(33, 38, 45, 0.5);
+  border: 1px dashed #30363D;
+  border-radius: 16px;
+}
+
+.history-empty .empty-icon {
+  color: #484F58;
+  margin-bottom: 16px;
+}
+
+.history-empty h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: #C9D1D9;
+}
+
+.history-empty p {
+  color: #8B949E;
+  margin-bottom: 24px;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary-neon);
+  color: #000;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(57, 255, 20, 0.3);
+}
+
+/* Pinterest Grid for Desktop */
+.history-grid {
+  columns: 1;
+  column-gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .history-grid {
+    columns: 2;
+  }
+}
+
+@media (min-width: 1200px) {
+  .history-grid {
+    columns: 3;
+  }
+}
+
+.history-card {
+  break-inside: avoid;
+  background: #161B22;
+  border: 1px solid #30363D;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.history-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(57, 255, 20, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.history-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #30363D;
+}
+
+.exercise-type {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.history-date {
+  font-size: 13px;
+  color: #8B949E;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.history-score-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.score-good {
+  background: rgba(57, 255, 20, 0.1);
+  color: var(--primary-neon);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+}
+
+.score-average {
+  background: rgba(255, 193, 7, 0.1);
+  color: #FFC107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.score-poor {
+  background: rgba(255, 71, 87, 0.1);
+  color: #FF4757;
+  border: 1px solid rgba(255, 71, 87, 0.3);
+}
+
+.history-feedback {
+  background: rgba(13, 17, 23, 0.5);
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 14px;
+  font-family: 'Poppins', 'Inter', sans-serif;
+  line-height: 1.6;
+  color: #C9D1D9;
+  white-space: pre-wrap;
+  margin: 0;
+  flex-grow: 1;
+}
+
+/* Tablet & Mobile Overrides (Vertical List) */
+@media (max-width: 767px) {
+  .history-page {
+    padding: 10px;
+  }
+  
+  .history-header h2 {
+    font-size: 24px;
+  }
+
+  .history-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .history-card {
+    margin-bottom: 0;
+  }
+}

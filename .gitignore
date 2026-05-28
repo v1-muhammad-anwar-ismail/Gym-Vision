@@ -1,0 +1,10 @@
+.meta-panel-trigger
+meta.bat
+
+# Global Ignores
+.DS_Store
+.idea/
+.vscode/
+*.log
+.env
+.env.*

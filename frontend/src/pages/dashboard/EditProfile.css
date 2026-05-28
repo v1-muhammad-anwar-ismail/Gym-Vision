@@ -1,0 +1,243 @@
+.edit-profile-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px;
+  position: relative;
+}
+
+.back-button {
+  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.back-button:hover {
+  background: var(--primary-neon);
+  color: var(--bg-dark);
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Avatar Upload styling */
+.avatar-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.avatar-preview-wrapper {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  border: 2px dashed var(--glass-border);
+  overflow: hidden;
+  transition: var(--transition-smooth);
+}
+
+.avatar-preview-wrapper:hover {
+  border-color: var(--primary-neon);
+}
+
+.avatar-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-neon), var(--secondary-neon));
+  color: var(--bg-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+.avatar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: var(--transition-smooth);
+}
+
+.avatar-preview-wrapper:hover .avatar-overlay {
+  opacity: 1;
+}
+
+.avatar-badge {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  background: var(--primary-neon);
+  color: var(--bg-dark);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid var(--bg-dark);
+  display: none; /* hidden by default on desktop */
+}
+
+.avatar-hint {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* Form Groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-group.half {
+  flex: 1;
+}
+
+.form-input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
+  padding: 14px 16px;
+  border-radius: 8px;
+  color: var(--text-main);
+  font-family: var(--font-main);
+  font-size: 1rem;
+  transition: var(--transition-smooth);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-neon);
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+.form-input.error {
+  border-color: #ff3b30;
+  box-shadow: 0 0 10px rgba(255, 59, 48, 0.2);
+}
+
+.form-input.success {
+  border-color: #34c759;
+  box-shadow: 0 0 10px rgba(52, 199, 89, 0.2);
+}
+
+.username-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.username-input-wrapper input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.username-status {
+  position: absolute;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-text {
+  font-size: 0.8rem;
+  color: #ff3b30;
+  margin-top: 4px;
+}
+
+.success-text {
+  font-size: 0.8rem;
+  color: #34c759;
+  margin-top: 4px;
+}
+
+.alert {
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.alert.success {
+  background: rgba(52, 199, 89, 0.1);
+  border: 1px solid rgba(52, 199, 89, 0.3);
+  color: #34c759;
+}
+
+.alert.error {
+  background: rgba(255, 59, 48, 0.1);
+  border: 1px solid rgba(255, 59, 48, 0.3);
+  color: #ff3b30;
+}
+
+.submit-btn {
+  margin-top: 16px;
+  width: 100%;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .avatar-badge {
+    display: flex;
+  }
+  .avatar-overlay {
+    display: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .form-row {
+    flex-direction: column;
+  }
+  .edit-profile-container {
+    padding: 24px 16px;
+  }
+}

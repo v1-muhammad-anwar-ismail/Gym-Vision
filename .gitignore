@@ -8,3 +8,8 @@ meta.bat
 *.log
 .env
 .env.*
+
+# Documents and IDE Scripts
+meta
+*.docx
+*.pdf

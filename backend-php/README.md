@@ -12,7 +12,7 @@ Backend Laravel berperan sebagai perantara (API) utama antara layar pengguna (Fr
 Pastikan tim Anda sudah menginstal komponen-komponen berikut di komputernya:
 - **PHP** (Versi 8.3 atau lebih baru) - Mesin utama untuk menjalankan framework Laravel 11.
 - **Composer** (Package Manager untuk PHP) - Untuk mengunduh plugin dan modul backend.
-- **SQLite** - Database relasional ringan. Biasanya sudah otomatis didukung oleh PHP (ekstensi `pdo_sqlite`). Anda tidak perlu repot menginstal server database berat seperti MySQL.
+- **MySQL** - Database relasional yang kita gunakan. Anda bisa menginstal MySQL secara terpisah atau menggunakan paket server lokal seperti XAMPP / Laragon.
 - **Node.js & NPM** (Opsional/Pendukung) - Meski ini backend PHP, instalasi Node kadang diminta oleh paket aset internal Laravel.
 
 ## Panduan Instalasi & Setup (Setup Instructions)
@@ -37,11 +37,15 @@ Pastikan tim Anda sudah menginstal komponen-komponen berikut di komputernya:
    ```
    *(Jika Anda menggunakan Windows dan tidak ada perintah `cp`, cukup *copy* file `.env.example` lalu *paste* dan ganti namanya menjadi `.env` secara manual lewat File Explorer).*
 
-   Buka file `.env` yang baru terbentuk. Cari tulisan `DB_CONNECTION` dan ubah menjadi:
+   Buka file `.env` yang baru terbentuk. Cari pengaturan database dan sesuaikan dengan konfigurasi MySQL lokal Anda, misalnya:
    ```env
-   DB_CONNECTION=sqlite
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=gymvision_db
+   DB_USERNAME=root
+   DB_PASSWORD=
    ```
-   (Anda boleh menghapus baris `DB_HOST`, `DB_PORT`, `DB_DATABASE` dan `DB_USERNAME` di bawahnya karena SQLite menggunakan file lokal alih-alih server).
 
 4. **Men-generate Application Key**
    Buat kunci keamanan enkripsi (kriptografi) unik untuk aplikasi Anda:
@@ -49,15 +53,14 @@ Pastikan tim Anda sudah menginstal komponen-komponen berikut di komputernya:
    php artisan key:generate
    ```
 
-5. **Membuat File Database & Menjalankan Migrasi**
-   Oleh karena kita menggunakan SQLite, kita hanya perlu satu file kosong sebagai database-nya.
-   - Buat file kosong bernama `database.sqlite` dan simpan di dalam folder `database/` (bisa dengan klik kanan -> New File -> `database.sqlite`).
+5. **Membuat Database & Menjalankan Migrasi**
+   Pastikan server MySQL Anda (misal dari XAMPP) sudah menyala.
+   - Buat database baru di MySQL (bisa lewat phpMyAdmin atau CLI) dengan nama sesuai yang Anda isi di `.env` (misal: `gymvision_db`).
    
-   Setelah file terbuat, jalankan perintah migrasi untuk secara otomatis membangun tabel-tabel di dalamnya:
+   Setelah database terbuat, jalankan perintah migrasi untuk secara otomatis membangun tabel-tabel di dalamnya:
    ```bash
    php artisan migrate
    ```
-   *(Pilih "Yes" jika ada pertanyaan konfirmasi untuk membuat database otomatis).*
 
 6. **Menjalankan Server Backend**
    Jalankan server pengembangan Laravel. Kita akan memaksa server berjalan di port `7001` agar sesuai dengan setelan di Frontend.

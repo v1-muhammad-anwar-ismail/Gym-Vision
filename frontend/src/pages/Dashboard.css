@@ -1,0 +1,149 @@
+.dashboard-container {
+  padding-top: 100px; /* space for navbar */
+  padding-bottom: 60px;
+  min-height: 100vh;
+}
+
+.dashboard-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: var(--primary-neon);
+  font-size: 1.2rem;
+}
+
+.dashboard-header {
+  margin-bottom: 48px;
+  text-align: center;
+}
+
+.dashboard-avatar-large {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--primary-neon);
+  box-shadow: 0 0 15px var(--primary-glow);
+  margin: 0 auto;
+}
+
+.dashboard-avatar-placeholder-large {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-neon), var(--secondary-neon));
+  color: var(--bg-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0 auto;
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* Responsive Grid */
+@media (max-width: 992px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dashboard Cards */
+.dash-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: var(--transition-smooth);
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text-main);
+  border-bottom: 3px solid transparent; /* default */
+}
+
+.dash-card h3 {
+  margin-top: 16px;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.dash-card-icon {
+  color: var(--primary-neon);
+  background: rgba(0, 240, 255, 0.1);
+  padding: 16px;
+  border-radius: 50%;
+  transition: var(--transition-smooth);
+}
+
+.dash-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom-color: var(--primary-neon);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.dash-card:hover .dash-card-icon {
+  background: var(--primary-neon);
+  color: var(--bg-dark);
+  box-shadow: 0 0 15px var(--primary-glow);
+}
+
+/* Admin Card Specifics */
+.admin-card .dash-card-icon {
+  color: var(--secondary-neon);
+  background: rgba(191, 0, 255, 0.1);
+}
+
+.admin-card:hover {
+  border-bottom-color: var(--secondary-neon);
+}
+
+.admin-card:hover .dash-card-icon {
+  background: var(--secondary-neon);
+  color: var(--bg-dark);
+  box-shadow: 0 0 15px var(--secondary-glow);
+}
+
+/* Danger Card (Logout) */
+.danger-card {
+  background: rgba(255, 59, 48, 0.02);
+  border: 1px solid rgba(255, 59, 48, 0.1);
+}
+
+.danger-card .dash-card-icon {
+  color: #ff3b30;
+  background: rgba(255, 59, 48, 0.1);
+}
+
+.danger-card:hover {
+  border-bottom-color: #ff3b30;
+  background: rgba(255, 59, 48, 0.05);
+}
+
+.danger-card:hover .dash-card-icon {
+  background: #ff3b30;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(255, 59, 48, 0.4);
+}

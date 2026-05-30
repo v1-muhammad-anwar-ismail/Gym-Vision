@@ -1,0 +1,430 @@
+.rep-counter-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 24px;
+  transition: color 0.2s ease;
+  padding: 0;
+}
+
+.back-btn:hover {
+  color: var(--primary-neon);
+}
+
+.rep-counter-card {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.card-header {
+  background: rgba(255, 255, 255, 0.02);
+  padding: 32px;
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.card-header .icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: rgba(57, 255, 20, 0.1);
+  color: var(--primary-neon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card-header h1 {
+  font-size: 1.8rem;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.card-header p {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.card-body {
+  padding: 32px;
+}
+
+.warning-box {
+  display: flex;
+  gap: 16px;
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 32px;
+}
+
+.warning-box p {
+  margin: 0;
+  color: #E2E8F0;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.warning-box strong {
+  color: #FFC107;
+}
+
+.section-label {
+  display: block;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.category-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.category-tab {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  flex: 1;
+  text-align: center;
+}
+
+.category-tab:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+}
+
+.category-tab.active {
+  background: rgba(57, 255, 20, 0.15);
+  border-color: var(--primary-neon);
+  color: var(--primary-neon);
+}
+
+.category-tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.mobile-category-btn {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  color: var(--text-main);
+  font-size: 1rem;
+  text-align: left;
+  margin-bottom: 32px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mobile-category-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.mobile-category-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-start-camera {
+  width: 100%;
+  padding: 16px;
+  background: var(--primary-neon);
+  color: #000;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+}
+
+.btn-start-camera:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(57, 255, 20, 0.3);
+}
+
+.btn-start-camera:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(0, 0, 0, 0.3);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
+  background: rgba(255, 71, 87, 0.1);
+  color: #FF4757;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  margin-bottom: 24px;
+}
+
+.result-box {
+  background: rgba(57, 255, 20, 0.05);
+  border: 1px solid rgba(57, 255, 20, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.result-box h3 {
+  color: var(--primary-neon);
+  margin-bottom: 20px;
+  font-size: 1.3rem;
+}
+
+.result-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  border-radius: 8px;
+  flex: 1;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-neon);
+}
+
+.stat.total {
+  background: rgba(0, 243, 255, 0.1);
+  border: 1px solid rgba(0, 243, 255, 0.3);
+}
+
+.stat.total .stat-value {
+  color: var(--secondary-neon);
+  text-shadow: 0 0 10px rgba(181, 61, 255, 0.5);
+}
+
+.camera-container {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 4/3;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #000;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.camera-container video,
+.camera-container canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.camera-container canvas {
+  z-index: 10;
+}
+
+.success-note {
+  color: #94A3B8;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.btn-stop-camera {
+  width: 100%;
+  padding: 16px;
+  background: rgba(255, 71, 87, 0.15);
+  color: #FF4757;
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+}
+
+.btn-stop-camera:hover {
+  background: #FF4757;
+  color: #FFF;
+  box-shadow: 0 8px 20px rgba(255, 71, 87, 0.3);
+}
+
+/* Custom SweetAlert styles */
+.my-swal-popup {
+  background: rgba(15, 15, 25, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid var(--glass-border) !important;
+  color: var(--text-main) !important;
+  border-radius: 16px !important;
+}
+
+.swal2-radio label {
+  color: var(--text-main) !important;
+}
+.swal2-title {
+  color: var(--text-main) !important;
+}
+
+/* Responsive constraints */
+@media (max-width: 768px) {
+  .rep-counter-container {
+    padding: 20px 0;
+    margin: 0 -12px;
+    width: calc(100% + 24px);
+  }
+  
+  .card-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px;
+    gap: 16px;
+  }
+  
+  .result-stats {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+/* SweetAlert Radio List Styling */
+.swal2-radio {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  max-height: 250px !important; /* Forces scroll if > 5 items */
+  overflow-y: auto !important;
+  gap: 12px !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 10px 5px !important;
+  margin-top: 15px !important;
+}
+
+.swal2-radio label {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  padding: 14px 16px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  margin: 0 !important;
+  box-sizing: border-box;
+}
+
+.swal2-radio label:hover {
+  background: rgba(0, 243, 255, 0.1) !important;
+  border-color: rgba(0, 243, 255, 0.3) !important;
+}
+
+.swal2-radio input[type="radio"] {
+  accent-color: var(--primary-neon) !important;
+  margin-right: 14px !important;
+  transform: scale(1.3) !important;
+  cursor: pointer;
+}
+
+.swal2-radio .swal2-label {
+  color: #fff !important;
+  font-size: 1.1rem !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+}
+
+/* Custom Scrollbar for radio list */
+.swal2-radio::-webkit-scrollbar {
+  width: 6px;
+}
+.swal2-radio::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+.swal2-radio::-webkit-scrollbar-thumb {
+  background: var(--primary-neon);
+  border-radius: 4px;
+}
+
+/* Back Button (Imported from EditProfile.css) */
+.back-button {
+  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.back-button:hover {
+  background: var(--primary-neon);
+  color: var(--bg-dark);
+  box-shadow: 0 0 15px var(--primary-glow);
+}

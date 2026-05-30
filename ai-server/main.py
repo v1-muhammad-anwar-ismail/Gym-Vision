@@ -11,6 +11,7 @@ import numpy as np
 import requests
 import json
 import urllib.request
+import base64
 
 load_dotenv()
 PORT = int(os.getenv("PORT", 7002))
@@ -79,6 +80,7 @@ def analyze_video_cv(video_path, exercise_type):
     # Initialize trackers: min, max for each joint
     joint_data = {name: {"min": 180.0, "max": 0.0} for name in joint_definitions}
     frame_count = 0
+    thumbnail_base64 = None
     
     base_options = python.BaseOptions(model_asset_path=MODEL_PATH)
     options = vision.PoseLandmarkerOptions(
@@ -104,6 +106,11 @@ def analyze_video_cv(video_path, exercise_type):
                 landmarks = results.pose_landmarks[0]
                 frame_count += 1
                 
+                if thumbnail_base64 is None:
+                    success, encoded_img = cv2.imencode('.webp', frame, [cv2.IMWRITE_WEBP_QUALITY, 70])
+                    if success:
+                        thumbnail_base64 = base64.b64encode(encoded_img.tobytes()).decode('utf-8')
+                
                 for name, (idx_a, idx_b, idx_c) in joint_definitions.items():
                     a = [landmarks[idx_a].x, landmarks[idx_a].y]
                     b = [landmarks[idx_b].x, landmarks[idx_b].y]
@@ -127,6 +134,9 @@ def analyze_video_cv(video_path, exercise_type):
     
     cv_result["frames_analyzed"] = frame_count
     
+    if thumbnail_base64:
+        cv_result["thumbnail_base64"] = thumbnail_base64
+        
     return cv_result
 
 def call_ai_api(req: AnalysisRequest, cv_data: dict):
@@ -140,23 +150,40 @@ def call_ai_api(req: AnalysisRequest, cv_data: dict):
     
     # Determine feedback language
     lang_name = "Indonesian (Bahasa Indonesia)" if req.language == "id" else "English"
-    
+    # Calculate a mathematical baseline so the LLM isn't guessing blindly
+    # (LLMs are bad at math, so we provide the raw accuracy percentage)
+    math_score = 100
+    for key in cv_data.keys():
+        if "Left" in key and "ROM" in key:
+            right_key = key.replace("Left", "Right")
+            if right_key in cv_data:
+                diff = abs(cv_data[key] - cv_data[right_key])
+                # Fine-tuning threshold to 23.5° and multiplier to 2.384x
+                # Converged: midpoint between best two experiments
+                if diff > 23.5:
+                    math_score -= (diff - 23.5) * 2.38
+    math_score = max(5, min(100, int(math_score)))
+
     prompt = f"""You are an expert AI Fitness Coach and Biomechanics Analyst. 
 A user just recorded themselves performing: "{req.exercise_type}".
 Computer vision (MediaPipe Pose) has tracked 8 major joints across {cv_data.get('frames_analyzed', 'N/A')} video frames and extracted the following kinematic data (Min angle, Max angle, and Range of Motion for each joint on both sides):
 
 {cv_str}
 
+*SYSTEM NOTE: A separate mathematical algorithm has analyzed the angles above and calculated the raw biomechanical accuracy score as: {math_score}/100.*
+
 ANALYSIS INSTRUCTIONS:
-1. Translate this raw data into human-friendly advice. Do NOT quote exact numbers or use technical terms like "ROM 176,5°" as this confuses normal users.
-2. Tell the user whether their movement was correct/good based on the symmetry and range of motion.
-3. Provide practical, actionable tips and solutions for their next set (e.g., "Keep your back straight", "Lower the dumbbells further down", "Make sure both arms move at the same speed").
-4. Keep the tone encouraging, conversational, and acting like a professional personal trainer.
+1. Translate this raw data into human-friendly advice. Do NOT quote exact numbers or use technical terms like "ROM 176,5°".
+2. Critically evaluate whether their movement was correct based on symmetry and range of motion. If there are major flaws (e.g., severe asymmetry, terrible range of motion), call them out explicitly!
+3. Provide practical, actionable tips and solutions for their next set.
+4. Provide a realistic form score from 1 to 100. 
+   - You MUST anchor your score extremely closely to the mathematical baseline provided above ({math_score}/100).
+   - If the baseline says 10, your score MUST be around 10. If the baseline says 95, your score MUST be around 95. 
 5. Provide the feedback in {lang_name}, max 3-4 sentences.
 
 Provide your response as a JSON object with exactly these keys:
 - "feedback": The conversational feedback string based on the above instructions.
-- "score": An integer 0-100 representing overall form quality.
+- "score": An integer from 1 to 100 representing the form quality score you determined.
 
 Return ONLY the raw JSON object. No markdown, no code blocks, no extra text."""
     
@@ -212,21 +239,32 @@ Return ONLY the raw JSON object. No markdown, no code blocks, no extra text."""
             text_response = data['choices'][0]['message']['content']
             
         try:
-            clean_text = text_response.strip()
-            if clean_text.startswith("```json"):
-                clean_text = clean_text[7:]
-            if clean_text.startswith("```"):
-                clean_text = clean_text[3:]
-            if clean_text.endswith("```"):
-                clean_text = clean_text[:-3]
-            clean_text = clean_text.strip()
-            
+            import re
+            # Extract JSON block even if there is conversational filler
+            json_match = re.search(r'\{.*\}', text_response, re.DOTALL)
+            if json_match:
+                clean_text = json_match.group(0)
+            else:
+                clean_text = text_response
+                
             result = json.loads(clean_text)
-            return result
+            
+            # Ensure it has the required keys, fallback if missing
+            score = int(result.get('score', 0))
+            # Ensure score stays within 0-100
+            score = min(100, max(0, score))
+            feedback = result.get('feedback', text_response)
+            
+            return {"feedback": feedback, "score": score}
         except Exception as parse_e:
             print("JSON Parse Error:", parse_e)
-            return {"feedback": text_response, "score": 80}
+            print("Raw AI Response:", text_response)
+            # Try to extract a score if we can find a number near 'score'
+            score_match = re.search(r'"score"\s*:\s*(\d+)', text_response, re.IGNORECASE)
+            raw = int(score_match.group(1)) if score_match else 0
+            extracted_score = min(100, max(0, raw))
             
+            return {"feedback": text_response, "score": extracted_score}
     except requests.exceptions.Timeout:
         print("API Timeout Error")
         return {"feedback": f"Timeout: API {req.provider} tidak merespons dalam 120 detik. Coba lagi.", "score": 0}
@@ -244,6 +282,9 @@ def analyze_video(req: AnalysisRequest):
         # 1. Computer Vision Processing
         cv_data = analyze_video_cv(req.video_path, req.exercise_type)
         
+        # Extract thumbnail base64 and remove it from cv_data before sending to LLM
+        thumbnail_base64 = cv_data.pop("thumbnail_base64", None)
+        
         # 2. Call LLM API with the extracted data
         ai_result = call_ai_api(req, cv_data)
         
@@ -253,7 +294,8 @@ def analyze_video(req: AnalysisRequest):
             "video_path": req.video_path,
             "cv_data": cv_data,
             "ai_feedback": ai_result.get("feedback", "Analisis selesai."),
-            "score": ai_result.get("score", 85)
+            "score": ai_result.get("score", 85),
+            "thumbnail_base64": thumbnail_base64
         }
     except Exception as e:
         print(f"Analyze Error: {str(e)}")

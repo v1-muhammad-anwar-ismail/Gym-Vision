@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { UploadCloud, FileVideo, X, Activity, Play, AlertCircle, Cpu } from 'lucide-react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { UploadCloud, FileVideo, X, Activity, Play, AlertCircle, Cpu, Camera, Video, Square } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import './Analysis.css';
 
@@ -32,6 +32,35 @@ const Analysis: React.FC = () => {
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // --- Camera Feature States & Refs ---
+  const [inputMode, setInputMode] = useState<'upload' | 'camera'>('upload');
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  
+  const liveVideoRef = useRef<HTMLVideoElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const streamRef = useRef<MediaStream | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const resultSectionRef = useRef<HTMLDivElement>(null);
+
+  // Memoize the video object URL so it only changes when `file` changes,
+  // not on every re-render (prevents video flickering on input typing)
+  const videoUrl = useMemo(() => {
+    if (file) return URL.createObjectURL(file);
+    return null;
+  }, [file]);
+
+  // Auto-scroll to result section when analysis completes
+  useEffect(() => {
+    if (result && !isAnalyzing && resultSectionRef.current) {
+      setTimeout(() => {
+        resultSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [result, isAnalyzing]);
+
   useEffect(() => {
     // Fetch active AI configs for the dropdown
     const fetchAiConfigs = async () => {
@@ -56,8 +85,123 @@ const Analysis: React.FC = () => {
     if (token) {
       fetchAiConfigs();
     }
+
+    // Cleanup camera on unmount
+    return () => {
+      stopCamera();
+    };
   }, [token]);
 
+  // --- Camera Logic ---
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      streamRef.current = stream;
+      if (liveVideoRef.current) {
+        liveVideoRef.current.srcObject = stream;
+      }
+      setIsCameraActive(true);
+      setError(null);
+    } catch (err) {
+      console.error("Camera error:", err);
+      setError("Failed to access camera. Please ensure you have granted permission.");
+      setIsCameraActive(false);
+    }
+  };
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    setIsCameraActive(false);
+    if (liveVideoRef.current) {
+      liveVideoRef.current.srcObject = null;
+    }
+  };
+
+  const toggleInputMode = (mode: 'upload' | 'camera') => {
+    if (isRecording || isAnalyzing) return;
+    setInputMode(mode);
+    setFile(null); // clear existing file
+    setResult(null);
+    if (mode === 'camera') {
+      startCamera();
+    } else {
+      stopCamera();
+    }
+  };
+
+  const startRecording = () => {
+    if (!streamRef.current) return;
+    
+    chunksRef.current = [];
+    
+    // Try to record in mp4, fallback to webm
+    let options = { mimeType: 'video/mp4' };
+    if (!MediaRecorder.isTypeSupported('video/mp4')) {
+      options = { mimeType: 'video/webm' };
+    }
+
+    try {
+      const recorder = new MediaRecorder(streamRef.current, options);
+      mediaRecorderRef.current = recorder;
+      
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunksRef.current.push(e.data);
+        }
+      };
+
+      recorder.onstop = () => {
+        clearInterval(timerRef.current!);
+        // Create file from chunks
+        const blob = new Blob(chunksRef.current, { type: options.mimeType });
+        const ext = options.mimeType.includes('mp4') ? 'mp4' : 'webm';
+        const newFile = new File([blob], `recording_${Date.now()}.${ext}`, { type: options.mimeType });
+        
+        // Stop camera and set the recorded file as the active file
+        stopCamera();
+        setFile(newFile);
+        setIsRecording(false); // Safety net to ensure recording state clears
+        setInputMode('upload'); // Switch back to upload view to show the recorded file ready for analysis
+      };
+
+      recorder.start(1000); // collect chunks every second
+      setIsRecording(true);
+      setRecordingTime(0);
+      
+      // Max 2 minutes timer
+      timerRef.current = setInterval(() => {
+        setRecordingTime((prev) => {
+          if (prev >= 119) {
+            stopRecording();
+            return 120;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+      
+    } catch (err) {
+      console.error("MediaRecorder error:", err);
+      setError("Failed to start recording. Format might not be supported.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
+  // --- Upload Logic ---
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -69,9 +213,9 @@ const Analysis: React.FC = () => {
   };
 
   const validateAndSetFile = async (selectedFile: File) => {
-    const validTypes = ['video/mp4', 'video/quicktime', 'video/x-matroska', 'video/x-msvideo', 'video/avi'];
-    if (!selectedFile.type.startsWith('video/') && !validTypes.includes(selectedFile.type)) {
-      setError(t('an_invalid_file') || 'Please upload a valid video file (.mp4, .mov, .mkv, .avi).');
+    // ONLY ACCEPT MP4
+    if (!selectedFile.type.startsWith('video/mp4') && !selectedFile.name.toLowerCase().endsWith('.mp4')) {
+      setError(t('an_invalid_file') || 'Please upload a valid MP4 video file (.mp4). For other formats, use the camera feature.');
       return;
     }
 
@@ -112,7 +256,6 @@ const Analysis: React.FC = () => {
     }
   };
 
-  // Chunked upload for large files, single upload for small files
   const handleAnalyze = async () => {
     if (!file) return;
     if (!aiConfigId) {
@@ -249,7 +392,6 @@ const Analysis: React.FC = () => {
   const translateCvKey = (key: string, lang: string) => {
     let result = key.replace(/_/g, ' ').toUpperCase();
     if (lang === 'id') {
-      // Fix grammar: Left Shoulder -> Bahu Kiri
       result = result.replace('LEFT SHOULDER', 'BAHU KIRI');
       result = result.replace('RIGHT SHOULDER', 'BAHU KANAN');
       result = result.replace('LEFT ELBOW', 'SIKU KIRI');
@@ -262,8 +404,6 @@ const Analysis: React.FC = () => {
       result = result.replace('RIGHT WRIST', 'PERGELANGAN TANGAN KANAN');
       result = result.replace('LEFT ANKLE', 'PERGELANGAN KAKI KIRI');
       result = result.replace('RIGHT ANKLE', 'PERGELANGAN KAKI KANAN');
-      
-      // Values
       result = result.replace('MAX', 'MAKS');
       result = result.replace('ROM', 'RENTANG GERAK');
     }
@@ -276,6 +416,9 @@ const Analysis: React.FC = () => {
     setError(null);
     setUploadProgress(0);
     setExerciseType('');
+    if (inputMode === 'camera') {
+        startCamera();
+    }
   };
 
   return (
@@ -296,7 +439,7 @@ const Analysis: React.FC = () => {
       )}
       
       <div className="analysis-content">
-        {/* Left Col: Upload Form */}
+        {/* Left Col: Upload/Record Form */}
         <div className="analysis-card">
           
           <div className="form-group">
@@ -328,49 +471,114 @@ const Analysis: React.FC = () => {
           </div>
           
           <div className="form-group">
-            <label>{t('an_upload_title')}</label>
-            <div 
-              className={`upload-dropzone ${isDragging ? 'drag-active' : ''}`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                className="file-input" 
-                accept="video/mp4,video/quicktime,video/x-matroska,video/x-msvideo,video/avi,.mp4,.mov,.mkv,.avi"
-                onChange={handleFileChange}
-                disabled={isAnalyzing}
-              />
-              <UploadCloud size={48} className="upload-icon" />
-              <p>{t('an_upload_desc')}</p>
-              <span className="upload-hint">
-                {t('an_upload_hint')} <br/>
-                <span style={{ color: 'var(--primary-neon)', fontWeight: 500 }}>
-                  {t('an_max_duration_hint')}
-                </span>
-              </span>
+            <label>Input Method</label>
+            <div className="input-mode-tabs">
+              <button 
+                className={`tab-btn ${inputMode === 'upload' ? 'active' : ''}`}
+                onClick={() => toggleInputMode('upload')}
+                disabled={isRecording || isAnalyzing}
+              >
+                <UploadCloud size={18} /> Upload Video
+              </button>
+              <button 
+                className={`tab-btn ${inputMode === 'camera' ? 'active' : ''}`}
+                onClick={() => toggleInputMode('camera')}
+                disabled={isRecording || isAnalyzing}
+              >
+                <Camera size={18} /> Record Camera
+              </button>
             </div>
             
-            {file && (
-              <div className="selected-file">
-                <div className="file-info">
-                  <FileVideo size={20} color="var(--primary-neon)" />
-                  <div>
-                    <div className="file-name">{file.name}</div>
-                    <div className="file-size">
-                      {file.size >= 1073741824 
-                        ? (file.size / 1073741824).toFixed(2) + ' GB'
-                        : (file.size / (1024 * 1024)).toFixed(2) + ' MB'}
-                    </div>
-                  </div>
+            {/* UPLOAD MODE */}
+            {inputMode === 'upload' && (
+              <>
+                <div 
+                  className={`upload-dropzone ${isDragging ? 'drag-active' : ''}`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="file-input" 
+                    accept="video/mp4,.mp4"
+                    onChange={handleFileChange}
+                    disabled={isAnalyzing}
+                  />
+                  <UploadCloud size={48} className="upload-icon" />
+                  <p>{t('an_upload_desc') || 'Drag & drop an MP4 file here, or click to browse'}</p>
+                  <span className="upload-hint">
+                    Supports strictly MP4 only (Max 2GB) <br/>
+                    <span style={{ color: 'var(--primary-neon)', fontWeight: 500 }}>
+                      {t('an_max_duration_hint')}
+                    </span>
+                  </span>
                 </div>
-                {!isAnalyzing && (
-                  <button className="btn-remove-file" onClick={() => setFile(null)}>
-                    <X size={18} />
-                  </button>
+                
+                {file && (
+                  <div className="selected-file">
+                    <div className="file-info">
+                      <FileVideo size={20} color="var(--primary-neon)" />
+                      <div>
+                        <div className="file-name">{file.name}</div>
+                        <div className="file-size">
+                          {file.size >= 1073741824 
+                            ? (file.size / 1073741824).toFixed(2) + ' GB'
+                            : (file.size / (1024 * 1024)).toFixed(2) + ' MB'}
+                        </div>
+                      </div>
+                    </div>
+                    {!isAnalyzing && (
+                      <button className="btn-remove-file" onClick={() => { setFile(null); setResult(null); }}>
+                        <X size={18} />
+                      </button>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* CAMERA MODE */}
+            {inputMode === 'camera' && (
+              <div className="camera-container">
+                <div className="camera-preview-wrapper">
+                  <video 
+                    ref={liveVideoRef} 
+                    autoPlay 
+                    playsInline 
+                    muted 
+                    className={`live-video ${!isCameraActive ? 'hidden' : ''}`} 
+                  />
+                  {!isCameraActive && !error && (
+                    <div className="camera-placeholder">
+                      <Video size={40} opacity={0.5} />
+                      <p>Requesting camera access...</p>
+                    </div>
+                  )}
+                  {isRecording && (
+                    <div className="recording-indicator">
+                      <span className="recording-dot"></span>
+                      {formatTime(recordingTime)} / 02:00
+                    </div>
+                  )}
+                </div>
+                
+                {isCameraActive && (
+                  <div className="camera-controls">
+                    {!isRecording ? (
+                      <button className="btn-record start" onClick={startRecording}>
+                        <div className="record-circle"></div>
+                        Start Recording
+                      </button>
+                    ) : (
+                      <button className="btn-record stop" onClick={stopRecording}>
+                        <Square size={16} fill="currentColor" />
+                        Stop Recording
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             )}
@@ -379,7 +587,7 @@ const Analysis: React.FC = () => {
           <button 
             className="btn-analyze"
             onClick={handleAnalyze}
-            disabled={!file || isAnalyzing || exerciseType.trim() === '' || !aiConfigId}
+            disabled={!file || isAnalyzing || exerciseType.trim() === '' || !aiConfigId || isRecording}
           >
             {isAnalyzing 
               ? (uploadPhase === 'uploading'
@@ -413,7 +621,7 @@ const Analysis: React.FC = () => {
         </div>
 
         {/* Right Col: Result or Loading */}
-        <div>
+        <div ref={resultSectionRef}>
           {isAnalyzing && uploadPhase === 'processing' && (
             <div className="analysis-card analysis-loading">
               <div className="scan-line-container">
@@ -442,11 +650,13 @@ const Analysis: React.FC = () => {
             <div className="analysis-result-card">
               <div className="analysis-card" style={{ padding: '0', overflow: 'hidden' }}>
                 <div className="result-video-container">
-                  <video 
-                    className="result-video" 
-                    controls 
-                    src={URL.createObjectURL(file!)} 
-                  />
+                    {videoUrl && (
+                      <video 
+                        className="result-video" 
+                        controls 
+                        src={videoUrl} 
+                      />
+                    )}
                 </div>
               </div>
               

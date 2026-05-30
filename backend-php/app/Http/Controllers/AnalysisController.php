@@ -175,11 +175,24 @@ class AnalysisController extends Controller
             }
 
             $aiResult = $response->json();
+            
+            // Handle Thumbnail Extraction
+            $thumbnailPath = null;
+            if (isset($aiResult['thumbnail_base64']) && !empty($aiResult['thumbnail_base64'])) {
+                try {
+                    $imageData = base64_decode($aiResult['thumbnail_base64']);
+                    $fileName = 'thumbnails/thumb_' . time() . '_' . uniqid() . '.webp';
+                    \Illuminate\Support\Facades\Storage::disk('public')->put($fileName, $imageData);
+                    $thumbnailPath = $fileName;
+                } catch (\Exception $e) {
+                    Log::error('Failed to save thumbnail: ' . $e->getMessage());
+                }
+            }
 
             // Save to history
             $history = AnalysisHistory::create([
                 'user_id' => $user->id,
-                'video_path' => null,
+                'video_path' => $thumbnailPath,
                 'exercise_type' => $exerciseType,
                 'ai_feedback' => $aiResult['ai_feedback'] ?? 'Analisis selesai tanpa feedback tambahan.',
                 'score' => $aiResult['score'] ?? 0,

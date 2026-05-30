@@ -9,6 +9,7 @@ const backendUrl = (import.meta.env.VITE_BACKEND_URL || 'http://localhost:7001')
 interface AnalysisHistoryItem {
   id: number;
   exercise_type: string;
+  video_path?: string | null;
   ai_feedback: string;
   score: number;
   created_at: string;
@@ -111,6 +112,21 @@ const AnalysisHistory: React.FC = () => {
                   {item.score}
                 </div>
               </div>
+              
+              {item.video_path && (
+                <div className="history-thumbnail-container">
+                  <img 
+                    src={`${backendUrl}/storage/${item.video_path}`} 
+                    alt={item.exercise_type} 
+                    className="history-thumbnail" 
+                    loading="lazy"
+                  />
+                  <div className="history-thumbnail-overlay">
+                    <Activity size={24} color="#fff" />
+                  </div>
+                </div>
+              )}
+              
               <pre className="history-feedback">
                 {item.ai_feedback}
               </pre>

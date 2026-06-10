@@ -1,0 +1,20 @@
+.meta-panel-trigger
+meta.bat
+
+# Global Ignores
+.DS_Store
+.idea/
+.vscode/
+*.log
+.env
+.env.*
+
+# Documents and IDE Scripts
+meta
+*.docx
+*.pdf
+lifting_scanner/env/
+*.whl
+lifting_scanner/env/
+*.whl
+*.zip
